@@ -25,8 +25,8 @@ config.read(config_file)
 
 def check_database(conn):
     cursor = conn.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS shows (id NUMBER NOT NULL, name TEXT NOT NULL, series_name TEXT NOT NULL, season_name TEXT NOT NULL, type TEXT NOT NULL, series_id NUMBER NOT NULL, season_id NUMBER NOT NULL, server_id NUMBER NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
-    cursor.execute("CREATE TABLE IF NOT EXISTS movies (id NUMBER NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, server_id NUMBER NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
+    cursor.execute("CREATE TABLE IF NOT EXISTS shows (_id INTEGER PRIMARY KEY, id INTEGER NOT NULL, name TEXT NOT NULL, series_name TEXT NOT NULL, season_name TEXT NOT NULL, type TEXT NOT NULL, series_id INTEGER NOT NULL, season_id INTEGER NOT NULL, server_id TEXT NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
+    cursor.execute("CREATE TABLE IF NOT EXISTS movies (_id INTEGER PRIMARY KEY, id NUMBER NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, server_id TEXT NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
     
     conn.commit()
 
@@ -91,11 +91,10 @@ def send_mail(conn):
     
     print(json.loads(config["api"]["user_ids"]))
     
-    #FIXME: Newer than last 24h
     for user_id, email in json.loads(config["api"]["user_ids"]).items():
         print(user_id, email)
-        shows_rows = cursor.execute(f'SELECT series_name, series_id, server_id FROM shows WHERE user_id = "{user_id}" GROUP BY series_id ORDER BY timestamp ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
-        movies_rows = cursor.execute(f'SELECT name, id, server_id FROM movies WHERE user_id = "{user_id}" ORDER BY timestamp ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
+        shows_rows = cursor.execute(f'SELECT series_name, series_id, server_id FROM shows WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") GROUP BY series_id ORDER BY timestamp, _id ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
+        movies_rows = cursor.execute(f'SELECT name, id, server_id FROM movies WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") ORDER BY timestamp, _id ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
         
         shows_plain = ''
         shows_html = ''
