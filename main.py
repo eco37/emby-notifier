@@ -1,4 +1,5 @@
-# 
+#!/usr/bin/python3 
+# Dependencies: python3-requests
 
 import requests
 import sqlite3
