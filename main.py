@@ -15,12 +15,20 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 config_file = 'config.ini'
+basepath = os.path.dirname(os.path.abspath(__file__))
+#if len(basepath) <= 0:
+#    basepath = '.'
 
-if not os.path.exists(config_file):
+print(__file__)
+print(f'{basepath}/{config_file}')
+
+if not os.path.exists(f'{basepath}/{config_file}'):
     print("Error: Cant find config!")
+    exit(1)
+
 
 config = configparser.ConfigParser()
-config.read(config_file)
+config.read(f'{basepath}/{config_file}')
 
 
 def check_database(conn):
@@ -205,13 +213,13 @@ def send_mail(conn):
 
 
 def check_recent_state():
-    if os.path.exists(config["files"]["recent_state"]):
+    if os.path.exists(f'{basepath}/{config["files"]["recent_state"]}'):
         modify_time = datetime.fromtimestamp(os.path.getmtime(config["files"]["recent_state"]))
         delta = datetime.now() - modify_time
         
         print(delta.total_seconds())
         
-        if delta.total_seconds() >= config["mail"]["recent_interval"]:
+        if delta.total_seconds() >= int(config["mail"]["recent_interval"]):
             return True
     else:
         Path(config["files"]["recent_state"]).touch()
@@ -225,16 +233,16 @@ def check_recent_state():
 
 
 
-sql_conn = sqlite3.connect(config["files"]["database"])
+sql_conn = sqlite3.connect(f'{basepath}/{config["files"]["database"]}')
 check_database(sql_conn)
 
 get_recent_shows(sql_conn)
 get_recent_movies(sql_conn)
 
-send_mail(sql_conn)
+#send_mail(sql_conn)
 
-#if check_recent_state():
-#    send_mail(sql_conn)
+if check_recent_state():
+    send_mail(sql_conn)
 
 sql_conn.commit()
 sql_conn.close()
