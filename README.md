@@ -1,15 +1,15 @@
-# emby-notifier
+# Emby-notifier
 
 A notification script that sends a mail with posters of the latest added movies and shows.
+
+## Dependencies
+- python3
+- python3-requests
 
 It is tested to run on the host that runs Emby with the os Ubuntu 22.04, but it should be able to run on a seperate host as long the script can access Emby.
 
 For the links on the poster images to work, the user that recieves the email need to be able to access Emby from the internet or trough some other means.
 
-## Dependencies
-- python3
-- python3-requests
-  
 ## Install
 
 Move the files to the host(eg. the host that run Emby) and put them in the users home directory.
