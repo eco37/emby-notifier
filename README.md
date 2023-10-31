@@ -8,7 +8,7 @@ A notification script that sends a mail with posters of the latest added movies 
 
 It is tested to run on the host that runs Emby with the os Ubuntu 22.04, but it should be able to run on a seperate host as long the script can access Emby.
 
-For the links on the poster images to work, the user that recieves the email need to be able to access Emby from the internet or trough some other means.
+For the links on the poster images to work, the user that recieves the email need to be able to access Emby from the internet or trough some other means by the browser.
 
 ## Install
 
@@ -21,7 +21,7 @@ Open `config.ini` and configure your settings
 
 Add the files to crontab with `crontab -e`
 
-Add the following and change the paths so the match the path to the files in `/home/<user>/emby-notifier/`
+Add the following and change the paths so they match the path to the files in `/home/<user>/emby-notifier/`
 ```
 0 * * * * <path-to_pull-recent.py>
 0 10 * * * <path-to_sendmail-recent.py>
