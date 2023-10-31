@@ -25,9 +25,15 @@ config.read(f'{basepath}/{config_file}')
 # Initializing the database if not already done
 def check_database(conn):
     cursor = conn.cursor()
+
+    # Create tables
     cursor.execute("CREATE TABLE IF NOT EXISTS shows (_id INTEGER PRIMARY KEY, id INTEGER NOT NULL, name TEXT NOT NULL, series_name TEXT NOT NULL, season_name TEXT NOT NULL, type TEXT NOT NULL, series_id INTEGER NOT NULL, season_id INTEGER NOT NULL, server_id TEXT NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
     cursor.execute("CREATE TABLE IF NOT EXISTS movies (_id INTEGER PRIMARY KEY, id NUMBER NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, server_id TEXT NOT NULL, user_id TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(id,user_Id));");
-    
+ 
+    # Add triggers
+    cursor.execute("CREATE TRIGGER IF NOT EXISTS clean_shows AFTER INSERT ON shows BEGIN DELETE FROM shows WHERE _id IN (SELECT _id FROM shows ORDER BY _id DESC LIMIT 10000, -1); END;");
+    cursor.execute("CREATE TRIGGER IF NOT EXISTS clean_movies AFTER INSERT ON shows BEGIN DELETE FROM movies WHERE _id IN (SELECT _id FROM movies ORDER BY _id DESC LIMIT 10000, -1); END;");
+
     conn.commit()
 
 # Get method for the recent API

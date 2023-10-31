@@ -22,6 +22,7 @@ if not os.path.exists(f'{basepath}/{config_file}'):
 config = configparser.ConfigParser()
 config.read(f'{basepath}/{config_file}')
 
+#FIXME: Check if file exists
 conn = sqlite3.connect(f'{basepath}/{config["files"]["database"]}')
 cursor = conn.cursor()
 
@@ -44,8 +45,8 @@ server.login(config["mail"]["smtp_user"], config["mail"]["smtp_password"])
 
 for user_id, email in json.loads(config["api"]["user_ids"]).items():
     
-    shows_rows = cursor.execute(f'SELECT series_name, series_id, server_id FROM shows WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") GROUP BY series_id ORDER BY timestamp, _id ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
-    movies_rows = cursor.execute(f'SELECT name, id, server_id FROM movies WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") ORDER BY timestamp, _id ASC LIMIT {config["mail"]["recent_limit"]};').fetchall();
+    shows_rows = cursor.execute(f'SELECT series_name, series_id, server_id FROM shows WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") GROUP BY series_id ORDER BY timestamp DESC, _id DESC LIMIT {config["mail"]["recent_limit"]};').fetchall();
+    movies_rows = cursor.execute(f'SELECT name, id, server_id FROM movies WHERE user_id = "{user_id}" and timestamp > DATETIME("now", "-{config["mail"]["recent_interval"]} seconds") ORDER BY timestamp DESC, _id DESC LIMIT {config["mail"]["recent_limit"]};').fetchall();
     
     shows_plain = ''
     shows_html = ''
